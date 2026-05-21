@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { ChevronDown, MapPin } from 'lucide-react';
 
 /**
@@ -27,3 +27,10 @@ export function TenantFilter({ cities, selectedCity, onSelectCity }) {
     </div>
   );
 }
+
+TenantFilter.propTypes = {
+  cities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  selectedCity: PropTypes.string.isRequired,
+  onSelectCity: PropTypes.func.isRequired
+};
+

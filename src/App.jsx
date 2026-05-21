@@ -4,13 +4,12 @@ import { KpiCard } from './components/KpiCard';
 import { TenantFilter } from './components/TenantFilter';
 import { ComparisonChart } from './components/ComparisonChart';
 import { ChatAssistant } from './components/ChatAssistant';
+import { formatINR } from './utils/formatters';
 import {
   Building2,
   CheckCircle2,
   XCircle,
   Coins,
-  TrendingUp,
-  FileSpreadsheet,
   AlertCircle
 } from 'lucide-react';
 
@@ -24,7 +23,6 @@ export default function App() {
     totalRegistered,
     approved,
     rejected,
-    pending,
     totalCollection
   } = usePropertyData();
 
@@ -32,10 +30,11 @@ export default function App() {
   const [tablePage, setTablePage] = useState(0);
   const itemsPerPage = 8;
 
-  // Reset page when city changes
-  React.useEffect(() => {
+  // Handler for changing city and resetting page
+  const handleCityChange = (city) => {
+    setSelectedCity(city);
     setTablePage(0);
-  }, [selectedCity]);
+  };
 
   // Compute paginated table items
   const paginatedProperties = React.useMemo(() => {
@@ -61,7 +60,7 @@ export default function App() {
         <TenantFilter
           cities={cities}
           selectedCity={selectedCity}
-          onSelectCity={setSelectedCity}
+          onSelectCity={handleCityChange}
         />
       </header>
 
@@ -160,17 +159,8 @@ export default function App() {
                   </thead>
                   <tbody>
                     {paginatedProperties.map((p) => {
-                      const taxDue = new Intl.NumberFormat('en-IN', {
-                        style: 'currency',
-                        currency: 'INR',
-                        maximumFractionDigits: 0
-                      }).format(p.annual_tax_inr);
-                      
-                      const taxColl = new Intl.NumberFormat('en-IN', {
-                        style: 'currency',
-                        currency: 'INR',
-                        maximumFractionDigits: 0
-                      }).format(p.collection_inr);
+                      const taxDue = formatINR(p.annual_tax_inr);
+                      const taxColl = formatINR(p.collection_inr);
 
                       return (
                         <tr key={p.property_id}>

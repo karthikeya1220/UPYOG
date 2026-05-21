@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { Send, Bot, User, HelpCircle } from 'lucide-react';
 import { askPropertyQuestion } from '../utils/aiClient';
 
@@ -43,6 +44,7 @@ export function ChatAssistant({ selectedCity }) {
       const response = await askPropertyQuestion(textToSend, selectedCity);
       setMessages(prev => [...prev, { role: 'ai', text: response }]);
     } catch (err) {
+      console.error('AI chat error:', err);
       setMessages(prev => [
         ...prev,
         { role: 'ai', text: "Sorry, I had trouble answering that question. Please try again." }
@@ -131,3 +133,8 @@ export function ChatAssistant({ selectedCity }) {
     </div>
   );
 }
+
+ChatAssistant.propTypes = {
+  selectedCity: PropTypes.string.isRequired
+};
+

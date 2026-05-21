@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   BarChart,
   Bar,
@@ -10,6 +11,38 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { BarChart3, PieChart } from 'lucide-react';
+import { formatINR } from '../utils/formatters';
+
+// Custom interactive tooltip
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="custom-chart-tooltip">
+        <p className="tooltip-city">{label}</p>
+        {payload.map((item, idx) => {
+          const val = item.value;
+          const formattedVal =
+            item.name === 'Total Collection'
+              ? formatINR(val)
+              : `${val} Properties`;
+
+          return (
+            <p key={idx} className="tooltip-value" style={{ color: item.color }}>
+              {item.name}: {formattedVal}
+            </p>
+          );
+        })}
+      </div>
+    );
+  }
+  return null;
+};
+
+CustomTooltip.propTypes = {
+  active: PropTypes.bool,
+  payload: PropTypes.arrayOf(PropTypes.object),
+  label: PropTypes.string
+};
 
 /**
  * Recharts component showing data comparisons across all cities.
@@ -29,34 +62,6 @@ export function ComparisonChart({ citySummaries }) {
     return `₹${tickItem}`;
   };
 
-  // Custom interactive tooltip
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="custom-chart-tooltip">
-          <p className="tooltip-city">{label}</p>
-          {payload.map((item, idx) => {
-            const val = item.value;
-            const formattedVal =
-              item.name === 'Total Collection'
-                ? new Intl.NumberFormat('en-IN', {
-                    style: 'currency',
-                    currency: 'INR',
-                    maximumFractionDigits: 0,
-                  }).format(val)
-                : `${val} Properties`;
-
-            return (
-              <p key={idx} className="tooltip-value" style={{ color: item.color }}>
-                {item.name}: {formattedVal}
-              </p>
-            );
-          })}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="glass-card chart-section">
@@ -188,3 +193,17 @@ export function ComparisonChart({ citySummaries }) {
     </div>
   );
 }
+
+ComparisonChart.propTypes = {
+  citySummaries: PropTypes.arrayOf(
+    PropTypes.shape({
+      city: PropTypes.string.isRequired,
+      totalRegistered: PropTypes.number.isRequired,
+      approved: PropTypes.number.isRequired,
+      rejected: PropTypes.number.isRequired,
+      pending: PropTypes.number.isRequired,
+      totalCollection: PropTypes.number.isRequired
+    })
+  ).isRequired
+};
+

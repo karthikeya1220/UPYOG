@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { formatINR, formatNumber, formatPercent } from '../utils/formatters';
 
 /**
  * Reusable Card component to display key performance indicators (KPIs).
@@ -8,21 +10,13 @@ export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'nu
   
   // Custom formatter for the display value
   const formattedValue = React.useMemo(() => {
-    if (value === undefined || value === null) return '0';
-    
     if (format === 'currency') {
-      return new Intl.NumberFormat('en-IN', {
-        style: 'currency',
-        currency: 'INR',
-        maximumFractionDigits: 0
-      }).format(value);
+      return formatINR(value);
     }
-    
     if (format === 'percent') {
-      return `${value.toFixed(1)}%`;
+      return formatPercent(value);
     }
-    
-    return new Intl.NumberFormat('en-IN').format(value);
+    return formatNumber(value);
   }, [value, format]);
 
   // Map theme accent color to specific styling classes in index.css
@@ -42,3 +36,12 @@ export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'nu
     </div>
   );
 }
+
+KpiCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  icon: PropTypes.elementType,
+  color: PropTypes.oneOf(['blue', 'green', 'red', 'gold', 'amber']),
+  format: PropTypes.oneOf(['number', 'currency', 'percent'])
+};
+
