@@ -8,7 +8,9 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run --environment jsdom"
+    "test": "vitest run --environment jsdom",
+    "server": "node server/server.js",
+    "dev:all": "npx concurrently -k -p \"[{name}]\" -n \"client,server\" -c \"cyan,magenta\" \"npm run dev\" \"npm run server\""
   },
   "dependencies": {
     "lucide-react": "^1.16.0",

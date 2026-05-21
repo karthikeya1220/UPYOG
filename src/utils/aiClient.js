@@ -145,7 +145,8 @@ function resolveLocally(question) {
 
 /**
  * Dispatches a user query to the active AI API, fallbacking to the local calculations engine
- * if no API key is configured or if the query fits standard assessment questions.
+ * if the query fits standard assessment questions, and otherwise proxying the call
+ * through the server-side /api/chat endpoint.
  */
 export async function askPropertyQuestion(question, activeCity = 'All Cities') {
   // Check if we can answer locally (highly optimized, 100% correct, zero latency/network errors)
@@ -154,64 +155,33 @@ export async function askPropertyQuestion(question, activeCity = 'All Cities') {
     return localResponse;
   }
 
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    return "API Key not configured. Please add `VITE_GEMINI_API_KEY` to your `.env.local` to enable general AI chat. However, I can answer standard queries locally (try asking about collections, counts, or city comparisons!).";
-  }
-
-  // Generate context summaries
-  const data = rawPropertiesData;
-  const dataSummary = generateDataSummary(data);
-
-  // Construct prompt
-  const systemPrompt = `You are UPYOG's Property Tax AI Assistant. You have access to a dataset of 1,000 property records across 10 Indian cities.
-Answer the user's question using ONLY the following summarized data. 
-If the answer cannot be calculated from the context, politely explain that you don't have that information.
-Keep your response short and precise (1-2 sentences max). Always format currency amounts in INR (₹) using Indian number grouping (e.g. ₹12,34,567).
-
-DATASET CONTEXT SUMMARY:
-${JSON.stringify(dataSummary, null, 2)}
-
-Active Filter City: ${activeCity}
-`;
-
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = 'http://localhost:5001/api/chat';
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `${systemPrompt}\n\nUser Question: ${question}\nAnswer:`
-              }
-            ]
-          }
-        ],
-        generationConfig: {
-          temperature: 0.1,
-          maxOutputTokens: 150
-        }
-      })
+      body: JSON.stringify({ question, activeCity })
     });
 
     if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+      const errText = await response.text();
+      let errMsg = response.statusText;
+      try {
+        const errJson = JSON.parse(errText);
+        if (errJson.error) errMsg = errJson.error;
+      } catch {
+        // Fallback to response.statusText if body is not JSON
+      }
+      throw new Error(errMsg);
     }
 
     const resJson = await response.json();
-    const responseText = resJson.contents?.[0]?.parts?.[0]?.text;
-    if (!responseText) {
-      throw new Error("Empty response from AI");
-    }
-
-    return responseText.trim();
+    return resJson.answer;
   } catch (error) {
     console.error("AI API Call Error:", error);
     return `I encountered an error querying the AI assistant (${error.message}). Please try again.`;
   }
 }
+

@@ -4,9 +4,9 @@ import { formatINR, formatNumber, formatPercent } from '../utils/formatters';
 
 /**
  * Reusable Card component to display key performance indicators (KPIs).
- * Supports counts, currencies (INR), and percentages.
+ * Supports counts, currencies (INR), percentages, and a loading skeleton state.
  */
-export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'number' }) {
+export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'number', loading = false }) {
   
   // Custom formatter for the display value
   const formattedValue = React.useMemo(() => {
@@ -23,7 +23,7 @@ export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'nu
   const cardColorClass = `kpi-${color}`;
 
   return (
-    <div className={`glass-card kpi-card ${cardColorClass}`}>
+    <div className={`glass-card kpi-card ${cardColorClass} ${loading ? 'loading' : ''}`}>
       {Icon && (
         <div className="kpi-icon-wrapper">
           <Icon size={22} strokeWidth={2.5} />
@@ -31,7 +31,11 @@ export function KpiCard({ title, value, icon: Icon, color = 'blue', format = 'nu
       )}
       <div className="kpi-info">
         <div className="kpi-title">{title}</div>
-        <div className="kpi-value">{formattedValue}</div>
+        {loading ? (
+          <div className="skeleton-value pulsing" style={{ height: '24px', width: '90px', borderRadius: '4px', marginTop: '0.25rem' }}></div>
+        ) : (
+          <div className="kpi-value">{formattedValue}</div>
+        )}
       </div>
     </div>
   );
@@ -42,6 +46,8 @@ KpiCard.propTypes = {
   value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   icon: PropTypes.elementType,
   color: PropTypes.oneOf(['blue', 'green', 'red', 'gold', 'amber']),
-  format: PropTypes.oneOf(['number', 'currency', 'percent'])
+  format: PropTypes.oneOf(['number', 'currency', 'percent']),
+  loading: PropTypes.bool
 };
+
 
