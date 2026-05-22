@@ -32,6 +32,7 @@ export default function App() {
     citySummaries,
     typeDistribution,
     loading,
+    error,
     totalRegistered,
     approved,
     rejected,
@@ -178,7 +179,16 @@ export default function App() {
       {/* Main Grid Layout */}
       <main className="dashboard-grid">
         <div className="main-content">
-          
+          {error && (
+            <div className="error-banner" role="alert">
+              <AlertCircle size={18} />
+              <span>
+                <strong>Database Connection Alert:</strong> The dashboard is unable to reach the backend server (<code>{error}</code>). 
+                Please ensure PostgreSQL is running and start the application using <code>npm run dev:all</code>.
+              </span>
+            </div>
+          )}
+
           {/* KPI Dashboard */}
           <div className="kpi-container">
             <KpiCard
