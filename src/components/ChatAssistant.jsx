@@ -12,7 +12,7 @@ export function ChatAssistant({ selectedCity }) {
   ]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const chatEndRef = useRef(null);
+  const chatHistoryRef = useRef(null);
 
   // Suggested question chips for instant feedback
   const sampleQuestions = [
@@ -23,9 +23,14 @@ export function ChatAssistant({ selectedCity }) {
     "Compare total registrations between Pune and Jaipur."
   ];
 
-  // Auto scroll to latest message
+  // Auto scroll to latest message inside the scrollable chat history container
   const scrollToBottom = () => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatHistoryRef.current) {
+      chatHistoryRef.current.scrollTo({
+        top: chatHistoryRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => {
@@ -66,7 +71,7 @@ export function ChatAssistant({ selectedCity }) {
         <h2 className="chat-header-title">UPYOG AI Tax Assistant</h2>
       </div>
 
-      <div className="chat-history">
+      <div className="chat-history" ref={chatHistoryRef}>
         {messages.map((msg, index) => (
           <div
             key={index}
@@ -91,7 +96,6 @@ export function ChatAssistant({ selectedCity }) {
             </div>
           </div>
         )}
-        <div ref={chatEndRef} />
       </div>
 
       <div>
