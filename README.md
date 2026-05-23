@@ -2,6 +2,20 @@
 
 > A modern React dashboard for analyzing property tax data across 10 Indian cities with AI-powered chat insights.
 
+## 📸 Dashboard Previews
+
+### 1. Dark Mode Analytics (Default)
+![UPYOG Dashboard Dark Mode](./dashboard_all_cities_dark.png)
+
+### 2. Light Mode Analytics (Theme Toggle)
+![UPYOG Dashboard Light Mode](./dashboard_all_cities_light.png)
+
+### 3. Multi-Tenant Filters (Mumbai Selected)
+![UPYOG Dashboard Mumbai Filter](./dashboard_mumbai_filter.png)
+
+### 4. Interactive AI Tax Assistant
+![UPYOG AI Chat Assistant](./dashboard_ai_chat.png)
+
 ## 🎯 Problem Statement
 
 Build a multi-tenant property tax analytics dashboard for the UPYOG platform that serves 10 Indian cities. The dashboard must display key metrics, provide comparative analysis across cities, and enable natural language queries about property data through an AI assistant.
@@ -16,12 +30,12 @@ Build a multi-tenant property tax analytics dashboard for the UPYOG platform tha
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React 18+ with Vite
-- **Styling**: Tailwind CSS
-- **Charts**: Recharts
-- **AI API**: Claude (Anthropic) / Gemini / OpenAI
-- **Data**: 1,000 property records (JSON) — no database required
-- **Deployment**: GitHub (source) + Vercel/Netlify (optional)
+- **Frontend**: React 19 with Vite
+- **Backend (Optional Database Backend)**: Node.js / Express server proxying chat requests and managing REST API endpoints
+- **Database**: PostgreSQL with connection pooling (`pg`), table auto-creation, and self-seeding (1,000 properties loaded automatically on startup)
+- **Styling**: Vanilla CSS (customized premium glassmorphic UI with Light & Dark mode support)
+- **Charts**: Recharts (interactive Bar & Pie charts)
+- **AI API**: Gemini API (proxied securely via the backend server, incorporating dynamic database context)
 
 ## 📊 Dataset Overview
 
@@ -34,8 +48,9 @@ Build a multi-tenant property tax analytics dashboard for the UPYOG platform tha
 
 ### Prerequisites
 
-- Node.js 16+ and npm/yarn
-- API key from Claude, Gemini, or OpenAI (free tier)
+- Node.js 18+ and npm
+- PostgreSQL running locally (defaulting to standard ports and credentials)
+- Gemini API Key
 
 ### Installation
 
@@ -44,23 +59,28 @@ Build a multi-tenant property tax analytics dashboard for the UPYOG platform tha
 git clone https://github.com/YOUR_USERNAME/upyog-property-dashboard.git
 cd upyog-property-dashboard
 
-# Install dependencies
+# Install frontend dependencies
 npm install
 
-# Create .env file
+# Install backend dependencies
+cd server && npm install && cd ..
+
+# Create .env.local file in the root directory
 touch .env.local
 
-# Add your API key (never commit this!)
-echo "VITE_CLAUDE_API_KEY=your_key_here" >> .env.local
-# OR
+# Add your Gemini API key (never commit this!)
 echo "VITE_GEMINI_API_KEY=your_key_here" >> .env.local
 ```
 
 ### Running Locally
 
+To run the Vite frontend and Express server concurrently (which auto-creates/seeds the PostgreSQL database):
+
 ```bash
-npm run dev
-# Open http://localhost:5173
+npm run dev:all
+
+# Open client at http://localhost:5173
+# Backend runs at http://localhost:5001
 ```
 
 ### Build for Production
@@ -74,6 +94,9 @@ npm run preview
 
 ```
 upyog-property-dashboard/
+├── server/
+│   ├── package.json
+│   └── server.js
 ├── src/
 │   ├── components/
 │   │   ├── KpiCard.jsx
@@ -84,7 +107,7 @@ upyog-property-dashboard/
 │   ├── hooks/
 │   │   └── usePropertyData.js
 │   ├── utils/
-│   │   ├── dataProcessor.js
+│   │   ├── formatters.js
 │   │   ├── aiClient.js
 │   │   └── constants.js
 │   ├── data/
@@ -92,18 +115,16 @@ upyog-property-dashboard/
 │   ├── App.jsx
 │   └── index.css
 ├── public/
-│   └── properties.json (optional)
-├── docs/
-│   ├── PROJECT_CONTEXT.md
-│   ├── TASKS.md
-│   ├── DECISIONS.md
-│   ├── PROMPTS.md
-│   ├── BUGS.md
-│   ├── ARCHITECTURE.md
-│   ├── STYLE_GUIDE.md
-│   ├── API_CONTRACTS.md
-│   ├── LEARNINGS.md
-│   └── EXPERIMENTS.md
+├── API_CONTRACTS.md
+├── ARCHITECTURE.md
+├── BUGS.md
+├── DECISIONS.md
+├── EXPERIMENTS.md
+├── LEARNINGS.md
+├── PROJECT_CONTEXT.md
+├── PROMPTS.md
+├── STYLE_GUIDE.md
+├── TASKS.md
 ├── .env.local (ignored)
 ├── .gitignore
 ├── package.json
@@ -115,11 +136,11 @@ upyog-property-dashboard/
 
 | Component | Points | Status |
 |-----------|--------|--------|
-| KPI Dashboard (4 cards) | 30 | ⏳ In Progress |
-| Tenant Filter | 15 | ⏳ In Progress |
-| Comparison Chart | 10 | ⏳ In Progress |
-| AI Chat Assistant | 25 | ⏳ In Progress |
-| Code Quality & Structure | 10 | ⏳ In Progress |
+| KPI Dashboard (4 cards) | 30 | ✅ Done |
+| Tenant Filter | 15 | ✅ Done |
+| Comparison Chart | 10 | ✅ Done |
+| AI Chat Assistant | 25 | ✅ Done |
+| Code Quality & Structure | 10 | ✅ Done |
 | README & Setup | 10 | ✅ Done |
 | **Total** | **100** | |
 
@@ -163,28 +184,27 @@ The chat should answer questions like:
 
 ## 🐛 Troubleshooting
 
-See `docs/BUGS.md` for common issues and solutions.
+See `BUGS.md` for common issues and solutions.
 
 ## 📚 Additional Resources
 
 - [React Documentation](https://react.dev)
 - [Recharts Gallery](https://recharts.org/examples)
 - [Tailwind CSS Docs](https://tailwindcss.com)
-- [Claude API Guide](https://docs.anthropic.com)
 - [Gemini API Guide](https://ai.google.dev)
 
 ## ✅ Checklist Before Submission
 
-- [ ] All 4 KPIs display correctly
-- [ ] Tenant filter updates all components
-- [ ] Chart renders with multiple cities
-- [ ] AI chat responds to at least 5 sample questions
-- [ ] Code is well-structured and commented
-- [ ] properties.json is in repo
-- [ ] .env file is in .gitignore
-- [ ] README has complete setup instructions
-- [ ] Screenshots taken and ready
-- [ ] GitHub repo is public
+- [x] All 4 KPIs display correctly
+- [x] Tenant filter updates all components
+- [x] Chart renders with multiple cities
+- [x] AI chat responds to at least 5 sample questions
+- [x] Code is well-structured and commented
+- [x] properties.json is in repo
+- [x] .env file is in .gitignore
+- [x] README has complete setup instructions
+- [x] Screenshots taken and ready
+- [x] GitHub repo is public
 
 ## 📧 Questions?
 
@@ -192,5 +212,5 @@ Check `docs/PROJECT_CONTEXT.md` first, then refer to the assessment PDF for cont
 
 ---
 
-**Last Updated**: [Will auto-update in PROJECT_CONTEXT.md]  
-**Status**: Just started 🚀
+**Last Updated**: 2026-05-21  
+**Status**: Completed 🟢
